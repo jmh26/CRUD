@@ -76,6 +76,11 @@ class EditarGato :  AppCompatActivity(), CoroutineScope {
         lista_gatos = Utilidad.obtenerListaGatos(database_reference)
 
         modificar.setOnClickListener {
+            var localTime = LocalDateTime.now()
+                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+
+            fecha = localTime
+
             if (raza.text.toString().trim().isEmpty() ||
                     descripcion.text.toString().trim().isEmpty() ||
                     edad.text.toString().trim().isEmpty())
