@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "1044808850006",
+    "firebase_url": "https://ejemploprimero-6caa4-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "ejemploprimero-6caa4",
+    "storage_bucket": "ejemploprimero-6caa4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1044808850006:android:a5f42f578374d6fc6779f7",
+        "android_client_info": {
+          "package_name": "com.example.firebase"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB224jIMWXtxPC8Eo8fIYZ4Mj1Zg6Gwuf8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
