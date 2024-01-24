@@ -3,6 +3,7 @@ package com.example.firebase
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
@@ -29,7 +30,7 @@ import kotlin.coroutines.CoroutineContext
 
 class EditarGato :  AppCompatActivity(), CoroutineScope {
 
-    private lateinit var raza : EditText
+    private lateinit var nombre : EditText
     private lateinit var descripcion : EditText
     private lateinit var edad :  EditText
     private lateinit var calificacion: RatingBar
@@ -54,16 +55,16 @@ class EditarGato :  AppCompatActivity(), CoroutineScope {
         val this_activity = this
         job= Job()
 
-        pojo_gato = intent.getParcelableExtra<Gato>("raza")!!
+        pojo_gato = intent.getParcelableExtra<Gato>("nombre")!!
 
-        raza = findViewById(R.id.raza)
+        nombre = findViewById(R.id.nombre)
         descripcion = findViewById(R.id.Descripcion)
         edad = findViewById(R.id.edad)
         modificar = findViewById(R.id.editar)
         calificacion = findViewById(R.id.rateargato)
         imagen = findViewById(R.id.imagengato)
         volver = findViewById(R.id.volver)
-        raza.setText(pojo_gato.raza)
+        nombre.setText(pojo_gato.nombre)
         descripcion.setText(pojo_gato.descripcion)
         edad.setText(pojo_gato.edad.toString())
 
@@ -81,9 +82,9 @@ class EditarGato :  AppCompatActivity(), CoroutineScope {
 
             fecha = localTime
 
-            if (raza.text.toString().trim().isEmpty() ||
-                    descripcion.text.toString().trim().isEmpty() ||
-                    edad.text.toString().trim().isEmpty())
+            if (nombre.text.toString().trim().isEmpty() ||
+                descripcion.text.toString().trim().isEmpty() ||
+                edad.text.toString().trim().isEmpty())
 
             {
                 Toast.makeText(
@@ -98,14 +99,18 @@ class EditarGato :  AppCompatActivity(), CoroutineScope {
                         val url_imagen_firebase = Utilidad.guardarGato(storage_reference, pojo_gato.id!!, url_gato!!)
                     }
 
+                    val androidId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
+
                     Utilidad.escribirGato(
                         database_reference, pojo_gato.id!!,
-                        raza.text.toString().trim(),
+                        nombre.text.toString().trim(),
                         descripcion.text.toString().trim(),
                         edad.text.toString().trim().toInt(),
                         calificacion.rating.toString().trim().toFloat(),
                         fecha,
-                        url_imagen_firebase
+                        url_imagen_firebase,
+                        Estado.modificado,
+                        androidId
                     )
 
                     Utilidad.tostadaCorrutina(

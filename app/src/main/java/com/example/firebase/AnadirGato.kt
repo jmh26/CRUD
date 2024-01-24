@@ -3,6 +3,7 @@ package com.example.firebase
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
@@ -32,7 +33,7 @@ import kotlin.coroutines.CoroutineContext
 
 class AnadirGato : AppCompatActivity(), CoroutineScope {
 
-    private lateinit var nom_raza: EditText
+    private lateinit var nombre: EditText
     private lateinit var descripcion: EditText
     private lateinit var edad: EditText
     private lateinit var imagen: ImageView
@@ -61,7 +62,7 @@ class AnadirGato : AppCompatActivity(), CoroutineScope {
 
         job = Job()
 
-        nom_raza = findViewById(R.id.raza)
+        nombre = findViewById(R.id.nombre)
         descripcion = findViewById(R.id.Descripcion)
         edad = findViewById(R.id.edad)
         imagen = findViewById(R.id.imagengato)
@@ -86,7 +87,7 @@ class AnadirGato : AppCompatActivity(), CoroutineScope {
 
             fecha = localTime
 
-            if (nom_raza.toString().trim().isEmpty() || descripcion.toString().trim()
+            if (nombre.toString().trim().isEmpty() || descripcion.toString().trim()
                     .isEmpty() || calificacion.toString().trim().isEmpty()|| edad.toString().trim().isEmpty()
             ) {
                 Toast.makeText(
@@ -98,12 +99,12 @@ class AnadirGato : AppCompatActivity(), CoroutineScope {
                 ).show()
 
 
-            } else if (Utilidad.existegato(lista_gatos, nom_raza.text.toString().trim())) {
+            } else if (Utilidad.existegato(lista_gatos, nombre.text.toString().trim())) {
                 Toast.makeText(applicationContext, "Ese gato ya está en la bd", Toast.LENGTH_SHORT)
                     .show()
 
             } else {
-                var id_gen: String? = database_reference.child("Gatos").child("Razas").push().key
+                var id_gen: String? = database_reference.child("Gatos").child("Datos").push().key
 
 
                 launch {
@@ -111,17 +112,21 @@ class AnadirGato : AppCompatActivity(), CoroutineScope {
                         Utilidad.guardarGato(storage_reference, id_gen!!, url_gato!!)
 
 
+                    val androidId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
+
 
 
 
                     Utilidad.escribirGato(
                         database_reference, id_gen!!,
-                        nom_raza.text.toString().trim(),
+                        nombre.text.toString().trim(),
                         descripcion.text.toString().trim(),
                         edad.text.toString().trim().toInt(),
                         calificacion.rating.toString().trim().toFloat(),
                         fecha,
-                        url_gatos_firebase
+                        url_gatos_firebase,
+                        Estado.creado,
+                        androidId
                     )
                     Utilidad.tostadaCorrutina(
                         this_activity,

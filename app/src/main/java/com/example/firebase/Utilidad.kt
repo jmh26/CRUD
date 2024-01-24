@@ -19,19 +19,19 @@ import java.util.Locale
 
 class Utilidad {
     companion object{
-        fun existegato(gatos : List<Gato>, nom_raza: String): Boolean{
-            return gatos.any { it.raza!!.lowercase()== nom_raza.lowercase() }
+        fun existegato(gatos : List<Gato>, nombre: String): Boolean{
+            return gatos.any { it.nombre!!.lowercase() == nombre.lowercase() }
         }
 
         fun obtenerListaGatos(db_ref: DatabaseReference):MutableList<Gato>{
 
             var lista = mutableListOf<Gato>()
 
-            db_ref.child("Gatos").child("Razas").addValueEventListener(object : ValueEventListener{
+            db_ref.child("Gatos").child("Datos").addValueEventListener(object : ValueEventListener{
                 override fun onDataChange(snapshot: DataSnapshot){
                     snapshot.children.forEach{hijo: DataSnapshot ->
-                        val pojo_raza = hijo.getValue(Gato::class.java)
-                        lista.add(pojo_raza!!)
+                        val pojo_nombre = hijo.getValue(Gato::class.java)
+                        lista.add(pojo_nombre!!)
                     }
                 }
 
@@ -42,15 +42,17 @@ class Utilidad {
             return lista
         }
 
-        fun escribirGato(db_ref:DatabaseReference, id:String, raza:String, descripcion:String, edad:Int, calificacion:Float,fecha:String, url_firebase:String)=
-            db_ref.child("Gatos").child("Razas").child(id).setValue(Gato(
+        fun escribirGato(db_ref:DatabaseReference, id:String, nombre:String, descripcion:String, edad:Int, calificacion:Float,fecha:String, url_firebase:String, estado_notificacion: Int, user_notificacion: String)=
+            db_ref.child("Gatos").child("Datos").child(id).setValue(Gato(
                 id,
-                raza,
+                nombre,
                 descripcion,
                 edad,
                 calificacion,
                 fecha,
-                url_firebase
+                url_firebase,
+                estado_notificacion,
+                user_notificacion
             ))
 
         suspend fun guardarGato(sto_ref: StorageReference, id:String, imagen: Uri):String{

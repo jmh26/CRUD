@@ -2,6 +2,7 @@ package com.example.firebase
 
 import android.content.Context
 import android.content.Intent
+import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,9 +21,9 @@ import java.util.Date
 import java.util.Locale
 
 class GatoAdapter(private val lista_gato: MutableList<Gato>):
-        RecyclerView.Adapter<GatoAdapter.GatoViewHolder>(), Filterable {
-            private lateinit var contexto: Context
-            private var lista_filter = lista_gato
+    RecyclerView.Adapter<GatoAdapter.GatoViewHolder>(), Filterable {
+    private lateinit var contexto: Context
+    private var lista_filter = lista_gato
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -36,9 +37,9 @@ class GatoAdapter(private val lista_gato: MutableList<Gato>):
 
     override fun onBindViewHolder(holder: GatoAdapter.GatoViewHolder, position: Int){
         val item_actual = lista_filter[position]
-        holder.raza.text = item_actual.raza
+        holder.nombre.text = item_actual.nombre
         holder.descripcion.text = item_actual.descripcion
-        holder.edad.text = item_actual.edad.toString()
+        holder.edad.text = item_actual.edad.toString() + " años"
         holder.calificacion.rating = item_actual.calificacion?.toFloat() ?: 0.0f
         holder.fecha.text = item_actual.fecha
 
@@ -58,7 +59,7 @@ class GatoAdapter(private val lista_gato: MutableList<Gato>):
 
         holder.editar.setOnClickListener {
             val activity = Intent(contexto,EditarGato::class.java)
-            activity.putExtra("raza", item_actual)
+            activity.putExtra("nombre", item_actual)
             contexto.startActivity(activity)
         }
 
@@ -67,19 +68,37 @@ class GatoAdapter(private val lista_gato: MutableList<Gato>):
             val storage_reference = FirebaseStorage.getInstance().getReference()
 
             lista_filter.remove(item_actual)
+
+            val androidId = Settings.Secure.getString(contexto.contentResolver, Settings.Secure.ANDROID_ID)
+
+
             storage_reference.child("Gatos").child("Imagenes").child(item_actual.id!!).delete()
 
-            database_reference.child("Gatos").child("Razas").child(item_actual.id!!).removeValue()
+            database_reference.child("Gatos").child("Datos").child(item_actual.id!!).child("user_notificacion").setValue(androidId)
+            database_reference.child("Gatos").child("Datos").child(item_actual.id!!).removeValue()
+
             Toast.makeText(contexto, "Gato borrado", Toast.LENGTH_SHORT).show()
+
+
 
         }
 
     }
+
+    fun ordenarPorEdad(){
+        lista_gato.sortBy { it.edad }
+        notifyDataSetChanged()
+    }
+    fun ordenarPorNombre(){
+        lista_gato.sortBy { it.nombre }
+        notifyDataSetChanged()
+    }
+
     override fun getItemCount(): Int = lista_filter.size
 
     class GatoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
         val miniatura: ImageView = itemView.findViewById(R.id.item_miniatura)
-        val raza: TextView = itemView.findViewById(R.id.item_raza)
+        val nombre: TextView = itemView.findViewById(R.id.item_nombre)
         val descripcion: TextView = itemView.findViewById(R.id.item_descripcion)
         val edad: TextView = itemView.findViewById(R.id.item_edad)
         val calificacion: RatingBar = itemView.findViewById(R.id.item_rate)
@@ -96,7 +115,7 @@ class GatoAdapter(private val lista_gato: MutableList<Gato>):
                     lista_filter = lista_gato
                 } else{
                     lista_filter = (lista_gato.filter {
-                        it.raza.toString().lowercase().contains(busqueda)
+                        it.nombre.toString().lowercase().contains(busqueda)
                     }) as MutableList<Gato>
                 }
                 val filterResults = FilterResults()
@@ -111,7 +130,7 @@ class GatoAdapter(private val lista_gato: MutableList<Gato>):
         }
     }
 
-        }
+}
 
 
 

@@ -1,11 +1,15 @@
 package com.example.firebase
 
 import android.content.Intent
+import android.media.Image
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.Button
-import android.widget.SearchView
+import android.widget.ImageView
+import android.widget.PopupMenu
+import androidx.appcompat.widget.SearchView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -34,11 +38,11 @@ class VerGatos : AppCompatActivity() {
         lista = mutableListOf()
         database_reference = FirebaseDatabase.getInstance().getReference()
 
-        database_reference.child("Gatos").child("Razas").addValueEventListener(object : ValueEventListener{
+        database_reference.child("Gatos").child("Datos").addValueEventListener(object : ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot){
                 lista.clear()
                 snapshot.children.forEach{hijo : DataSnapshot?
-                ->
+                    ->
                     val pojo_gato = hijo?.getValue(Gato::class.java)
                     lista.add(pojo_gato!!)
                 }
@@ -62,15 +66,19 @@ class VerGatos : AppCompatActivity() {
 
         }
 
-    }
+        val imageViewFiltrar: ImageView = findViewById(R.id.embudo)
+        imageViewFiltrar.setOnClickListener{
+                view ->
+            showFiltrarMenu(view)
+        }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_gatos,menu)
-        val item = menu?.findItem(R.id.search)
-        val searchView = item?.actionView as SearchView
 
 
-        searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener{
+
+        val searchView = findViewById<SearchView>(R.id.Busqueda)
+
+
+        searchView.setOnQueryTextListener(object: androidx.appcompat.widget.SearchView.OnQueryTextListener{
             override fun onQueryTextSubmit(query: String?): Boolean {
                 return true
             }
@@ -82,20 +90,28 @@ class VerGatos : AppCompatActivity() {
 
         })
 
-        item.setOnActionExpandListener(object : MenuItem.OnActionExpandListener{
-            override fun onMenuItemActionExpand(p0: MenuItem?): Boolean {
-                return true
-            }
-
-            override fun onMenuItemActionCollapse(p0: MenuItem?): Boolean {
-                adaptador.filter.filter("")
-                return true
-            }
-        })
-
-        return super.onCreateOptionsMenu(menu)
-
     }
+
+    private fun showFiltrarMenu(view: View){
+        val popupMenu = PopupMenu(this,view)
+        popupMenu.menuInflater.inflate(R.menu.menu_gatos, popupMenu.menu)
+
+        popupMenu.setOnMenuItemClickListener { menuItem ->
+            when (menuItem.itemId){
+                R.id.porEdad -> {
+                    adaptador.ordenarPorEdad()
+                    true
+                }
+                R.id.porNombre -> {
+                    adaptador.ordenarPorNombre()
+                    true
+                }
+                else -> false
+            }
+        }
+        popupMenu.show()
+    }
+
 
 
 }
